@@ -1,8 +1,9 @@
 package infrastructures
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ErrorResponse struct {
@@ -13,22 +14,23 @@ type ErrorResponse struct {
 }
 
 type SuccessResponse struct {
-	Meta interface{} `json:"meta,omitempty"`
-	Data interface{} `json:"data,omitempty"`
-	Path string      `json:"path,omitempty"`
+	Path   string      `json:"path,omitempty"`
+	Meta   interface{} `json:"meta,omitempty"`
+	Status interface{} `json:"status,omitempty"`
+	Data   interface{} `json:"data,omitempty"`
 }
 
-func OkPaging(c *gin.Context, data interface{}, limit int64, offset int64, total int64) {
+func OkPaging(c *gin.Context, status interface{}, data interface{}, limit int64, offset int64, total int64) {
 	meta := make(map[string]interface{}, 3)
 	meta["size"] = limit
 	meta["page"] = offset
 	meta["total"] = total
 
-	c.JSON(http.StatusOK, SuccessResponse{Data: data, Meta: meta, Path: getCtxPath(c)})
+	c.JSON(http.StatusOK, SuccessResponse{Path: getCtxPath(c), Meta: meta, Status: status, Data: data})
 }
 
-func Ok(c *gin.Context, data interface{}, meta interface{}) {
-	c.JSON(http.StatusOK, SuccessResponse{Data: data, Meta: meta, Path: getCtxPath(c)})
+func Ok(c *gin.Context, meta interface{}, status interface{}, data interface{}) {
+	c.JSON(http.StatusOK, SuccessResponse{Path: getCtxPath(c), Meta: meta, Status: status, Data: data})
 }
 
 func Err500ISE(c *gin.Context, err string) {

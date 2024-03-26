@@ -3,6 +3,7 @@ package main
 import (
 	inf "dys-go-starter-project/infrastructures"
 	"dys-go-starter-project/infrastructures/middlewares"
+	"dys-go-starter-project/modules/auth/repositories"
 	authUserService "dys-go-starter-project/modules/auth/services"
 	"dys-go-starter-project/routes"
 	"dys-go-starter-project/utils/logger"
@@ -63,6 +64,10 @@ func registerServices() {
 		}
 
 		return authUserService.NewAuthService(db.(*xorm.Engine)), nil
+	})
+
+	inf.Bind[repositories.AuthUserRepository](func(db *xorm.Engine) (repositories.AuthUserRepository, error) {
+		return repositories.NewAuthUserRepositoryImpl(db), nil
 	})
 }
 

@@ -1,12 +1,11 @@
 package services
 
 import (
-	"crypto/md5"
 	inf "dys-go-starter-project/infrastructures"
 	"dys-go-starter-project/modules/auth/model"
 	"dys-go-starter-project/modules/auth/repositories"
+	"dys-go-starter-project/utils/formatter"
 	"errors"
-	"fmt"
 
 	"xorm.io/xorm"
 )
@@ -21,6 +20,7 @@ func NewAuthService(db *xorm.Engine) *AuthUserService {
 	}
 }
 
+// Getting user by Email
 func (s *AuthUserService) GetUserByEmail(email string) (*model.AuthUserModel, error) {
 	authUserRepository, err := inf.Get[repositories.AuthUserRepository](s.db)
 	if err != nil {
@@ -38,6 +38,21 @@ func (s *AuthUserService) GetUserByEmail(email string) (*model.AuthUserModel, er
 	return result, nil
 }
 
+// Store user
+func (s *AuthUserService) SaveUser(data *model.AuthUserModel) (*model.AuthUserModel, error) {
+	authUserRepository, err := inf.Get[repositories.AuthUserRepository](s.db)
+	if err != nil {
+		return nil, err
+	}
+	result, err := authUserRepository.SaveUser(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Validate user
 func (s *AuthUserService) ValidateLogin(email string, password string) (*model.AuthUserModel, error) {
 	authUserRepository, err := inf.Get[repositories.AuthUserRepository](s.db)
 	if err != nil {
@@ -53,18 +68,13 @@ func (s *AuthUserService) ValidateLogin(email string, password string) (*model.A
 		return nil, errors.New("user not found")
 	}
 
-	// if result.Password != s.encryptMd5(password) {
-	// 	return nil, errors.New("email or passwor does not match")
-	// }
-
-	if result.Password != password {
-		return nil, errors.New("email or passwor does not match")
+	if result.Password != formatter.EncryptMd5(password) {
+		return nil, errors.New("email or password does not match")
 	}
 
-	return result, nil
-}
+	// if result.Password != password {
+	// 	return nil, errors.New("email or password does not match")
+	// }
 
-func (s *AuthUserService) encryptMd5(word string) string {
-	h := md5.New()
-	return fmt.Sprintf("%x", h.Sum([]byte(word)))
+	return result, nil
 }

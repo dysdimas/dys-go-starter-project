@@ -1,5 +1,9 @@
 package model
 
+import (
+	"dys-go-starter-project/modules/auth/api/dtos/request"
+)
+
 const USER_TABLE_NAME = "users"
 
 type AuthUserModel struct {
@@ -13,4 +17,12 @@ type AuthUserModel struct {
 
 func (m *AuthUserModel) TableName() string {
 	return USER_TABLE_NAME
+}
+
+func ConvertToAuthUserModel(requestBody *request.RegisterRequest) *AuthUserModel {
+	return &AuthUserModel{
+		Name:     requestBody.Name,
+		Email:    requestBody.Email,
+		Password: requestBody.Password,
+	}
 }

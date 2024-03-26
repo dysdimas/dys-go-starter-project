@@ -5,7 +5,9 @@ import (
 	"dys-go-starter-project/modules/auth/api/dtos/impartial"
 	"dys-go-starter-project/modules/auth/api/dtos/request"
 	"dys-go-starter-project/modules/auth/api/dtos/response"
+	"dys-go-starter-project/modules/auth/model"
 	"dys-go-starter-project/modules/auth/services"
+	"net/http"
 	"os"
 	"time"
 
@@ -17,6 +19,7 @@ import (
 type AuthUserController struct {
 }
 
+// Login and validation from service
 func (c *AuthUserController) Login(ctx *gin.Context) {
 	requestBody := &request.LoginRequest{}
 	err := ctx.ShouldBindJSON(requestBody)
@@ -69,13 +72,49 @@ func (c *AuthUserController) Login(ctx *gin.Context) {
 	inf.Ok(
 		ctx,
 		&response.AuthResponse{
-			signedToken, createdAt.Unix(),
+			signedToken,
+			createdAt.Unix(),
 			expiredAt.Unix(),
 		},
+		nil,
 		nil,
 	)
 }
 
+// Store user controller
+func (c *AuthUserController) SaveUser(ctx *gin.Context) {
+	requestBody := &request.RegisterRequest{}
+	err := ctx.ShouldBindJSON(requestBody)
+	if err != nil {
+		inf.Err400BR(ctx, err.Error())
+		return
+	}
+
+	authUserService, err := inf.Get[*services.AuthUserService](ctx)
+	if err != nil {
+		inf.Err500ISE(ctx, err.Error())
+		return
+	}
+
+	userModel := model.ConvertToAuthUserModel(requestBody) // Convert to AuthUserModel
+	dataUser, err := authUserService.SaveUser(userModel)
+	if err != nil {
+		inf.Err500ISE(ctx, err.Error())
+		return
+	}
+
+	inf.Ok(
+		ctx,
+		nil,
+		&response.RegisterResponse{
+			Code:    http.StatusOK,
+			Message: "register successfully",
+		},
+		dataUser,
+	)
+}
+
+// Logout controller
 func (c *AuthUserController) Logout(ctx *gin.Context) {
-	inf.Ok(ctx, nil, nil)
+	inf.Ok(ctx, nil, nil, nil)
 }
