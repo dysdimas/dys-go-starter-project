@@ -9,6 +9,7 @@ import (
 func RegisterAuth(r *gin.RouterGroup) {
 	api := r.Group("/auth")
 	{
+		api.POST("/register", new(v1.AuthUserController).SaveUser)
 		api.POST("/login", new(v1.AuthUserController).Login)
 		api.POST("/logout", new(v1.AuthUserController).Logout)
 	}
