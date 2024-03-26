@@ -69,15 +69,19 @@ func (c *AuthUserController) Login(ctx *gin.Context) {
 		return
 	}
 
+	// the pattern is path, meta, response, data
 	inf.Ok(
 		ctx,
+		nil,
+		&response.LoginResponse{
+			Code:    http.StatusOK,
+			Message: "generate token successfully",
+		},
 		&response.AuthResponse{
 			signedToken,
 			createdAt.Unix(),
 			expiredAt.Unix(),
 		},
-		nil,
-		nil,
 	)
 }
 

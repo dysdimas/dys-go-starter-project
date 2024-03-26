@@ -5,6 +5,8 @@ import (
 	"dys-go-starter-project/infrastructures/middlewares"
 	"dys-go-starter-project/modules/auth/repositories"
 	authUserService "dys-go-starter-project/modules/auth/services"
+	userRepo "dys-go-starter-project/modules/user/repositories"
+	userService "dys-go-starter-project/modules/user/services"
 	"dys-go-starter-project/routes"
 	"dys-go-starter-project/utils/logger"
 	"errors"
@@ -57,6 +59,7 @@ func deferMain() {
 func registerServices() {
 	inf.Clear()
 
+	// Auth
 	inf.Bind[*authUserService.AuthUserService](func(ctx *gin.Context) (*authUserService.AuthUserService, error) {
 		db, exist := ctx.Get(inf.CtxDb)
 		if !exist {
@@ -68,6 +71,20 @@ func registerServices() {
 
 	inf.Bind[repositories.AuthUserRepository](func(db *xorm.Engine) (repositories.AuthUserRepository, error) {
 		return repositories.NewAuthUserRepositoryImpl(db), nil
+	})
+
+	// User
+	inf.Bind[*userService.UserService](func(ctx *gin.Context) (*userService.UserService, error) {
+		db, exist := ctx.Get(inf.CtxDb)
+		if !exist {
+			return nil, errors.New("db engine does not exist")
+		}
+
+		return userService.NewUserService(db.(*xorm.Engine)), nil
+	})
+
+	inf.Bind[userRepo.UserRepository](func(db *xorm.Engine) (userRepo.UserRepository, error) {
+		return userRepo.NewUserRepositoryImpl(db), nil
 	})
 }
 
