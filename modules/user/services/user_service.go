@@ -55,3 +55,27 @@ func (s *UserService) GetUserByEmail(email string) (*model.UserModel, error) {
 	}
 	return result, nil
 }
+
+// Update data by email
+func (s *UserService) UpdateUser(data *model.UserModel) error {
+	userRepository, err := inf.Get[repositories.UserRepository](s.db)
+	if err != nil {
+		return err
+	}
+
+	result, err := userRepository.GetUserByEmail(data.Email)
+	if err != nil {
+		return err
+	}
+
+	if result == nil {
+		return errors.New("user not found")
+	}
+
+	err = userRepository.UpdateUser(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -3,7 +3,11 @@ package controllers
 import (
 	inf "dys-go-starter-project/infrastructures"
 	"dys-go-starter-project/modules/user/api/dtos/impartial"
+	"dys-go-starter-project/modules/user/api/dtos/request"
+	"dys-go-starter-project/modules/user/api/dtos/response"
+	"dys-go-starter-project/modules/user/model"
 	"dys-go-starter-project/modules/user/services"
+	"dys-go-starter-project/utils/formatter"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -54,6 +58,47 @@ func (c *UserController) GetUserByEmail(ctx *gin.Context) {
 			Code:    http.StatusOK,
 			Message: "get user successfully",
 		},
-		user,
+		&response.UserResponse{
+			formatter.EncryptMd5(string(user.Id)),
+			user.Name,
+			user.Email,
+			user.CreatedAt,
+		},
 	)
+}
+
+func (c *UserController) UpdateUser(ctx *gin.Context) {
+	requestBody := &request.UserUpdateRequest{}
+	err := ctx.ShouldBindJSON(requestBody)
+	if err != nil {
+		inf.Err400BR(ctx, err.Error())
+		return
+	}
+
+	userService, err := inf.Get[*services.UserService](ctx)
+	if err != nil {
+		inf.Err500ISE(ctx, err.Error())
+	}
+
+	cnvUserModel := &model.UserModel{
+		Name:  requestBody.Name,
+		Email: requestBody.Email,
+	}
+
+	err = userService.UpdateUser(cnvUserModel)
+	if err != nil {
+		inf.Err404NF(ctx)
+		return
+	}
+
+	inf.Ok(
+		ctx,
+		nil,
+		&impartial.SuccessImpartial{
+			Code:    http.StatusOK,
+			Message: "update user successfully",
+		},
+		nil,
+	)
+
 }

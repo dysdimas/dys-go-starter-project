@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	GetAllUser() (*[]map[string]interface{}, error)
 	GetUserByEmail(email string) (*model.UserModel, error)
+	UpdateUser(*model.UserModel) error
 }
 
 type UserRepositoryImpl struct {
@@ -34,9 +35,25 @@ func (r UserRepositoryImpl) GetAllUser() (*[]map[string]interface{}, error) {
 // Get by email
 func (r UserRepositoryImpl) GetUserByEmail(email string) (*model.UserModel, error) {
 	results := model.UserModel{}
-	_, err := r.db.Table(model.USER_TABLE_NAME).Where("email = ?", email).Get(&results)
+	checkUser, err := r.db.Table(model.USER_TABLE_NAME).Where("email = ?", email).Get(&results)
 	if err != nil {
 		return nil, err
 	}
+
+	if !checkUser {
+		return nil, err
+	}
+
 	return &results, err
+}
+
+// Update data name by email
+func (r UserRepositoryImpl) UpdateUser(data *model.UserModel) error {
+	_, err := r.db.Table(model.USER_TABLE_NAME).Update(&model.UserModel{
+		Name: data.Name,
+	}, &model.UserModel{Email: data.Email})
+	if err != nil {
+		return err
+	}
+	return nil
 }
