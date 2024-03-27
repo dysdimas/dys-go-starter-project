@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"dys-go-starter-project/infrastructures"
-	"dys-go-starter-project/utils"
 	"fmt"
 	"os"
 	"strings"
@@ -33,29 +32,29 @@ func BearerAuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	audience := c.GetHeader(infrastructures.HeaderAppClient)
-	if audience == "" {
-		c.Abort()
-		c.Writer.Header().Set("WWW-Authenticate", "Bearer auth=Restricted")
-		infrastructures.Err400BR(c, "endpoint restricted")
-		return
-	}
+	//audience := c.GetHeader(infrastructures.HeaderAppClient)
+	//if audience == "" {
+	//	c.Abort()
+	//	c.Writer.Header().Set("WWW-Authenticate", "Bearer auth=Restricted")
+	//	infrastructures.Err400BR(c, "endpoint restricted")
+	//	return
+	//}
 
-	cfgAudiences := os.Getenv(infrastructures.EnvJwtAudiences)
-	if cfgAudiences == "" {
-		c.Abort()
-		infrastructures.Err500ISE(c, "audiences does not exist")
-		return
-	}
-
-	audiences := strings.Split(cfgAudiences, "|")
-	isContain := utils.SliceContains(audiences, audience)
-	if !isContain {
-		c.Abort()
-		c.Writer.Header().Set("WWW-Authenticate", "Bearer auth=Restricted")
-		infrastructures.Err400BR(c, "endpoint restricted")
-		return
-	}
+	//cfgAudiences := os.Getenv(infrastructures.EnvJwtAudiences)
+	//if cfgAudiences == "" {
+	//	c.Abort()
+	//	infrastructures.Err500ISE(c, "audiences does not exist")
+	//	return
+	//}
+	//
+	//audiences := strings.Split(cfgAudiences, "|")
+	//isContain := utils.SliceContains(audiences, audience)
+	//if !isContain {
+	//	c.Abort()
+	//	c.Writer.Header().Set("WWW-Authenticate", "Bearer auth=Restricted")
+	//	infrastructures.Err400BR(c, "endpoint restricted")
+	//	return
+	//}
 
 	tokenString := strings.Replace(authorizationHeader, fmt.Sprintf("%s ", infrastructures.AuthMethodBearer), "", -1)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -80,5 +79,5 @@ func BearerAuthMiddleware(c *gin.Context) {
 	}
 
 	c.Set(infrastructures.CtxClaims, claims)
-	c.Set(infrastructures.CtxAudience, audience)
+	//c.Set(infrastructures.CtxAudience, audience)
 }
