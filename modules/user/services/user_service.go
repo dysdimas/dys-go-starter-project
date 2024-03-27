@@ -79,3 +79,19 @@ func (s *UserService) UpdateUser(data *model.UserModel) error {
 
 	return nil
 }
+
+// Delete data user by email
+func (s *UserService) DeleteUser(email string) error {
+	userRepository, err := inf.Get[repositories.UserRepository](s.db)
+	if err != nil {
+		return err
+	}
+
+	err = userRepository.DeleteUser(email)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

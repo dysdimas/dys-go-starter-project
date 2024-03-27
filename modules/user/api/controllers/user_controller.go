@@ -102,3 +102,39 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 	)
 
 }
+
+func (c *UserController) DeleteUser(ctx *gin.Context) {
+	email := ctx.Query("email")
+	userService, err := inf.Get[*services.UserService](ctx)
+	if err != nil {
+		inf.Err500ISE(ctx, err.Error())
+		return
+	}
+
+	user, err := userService.GetUserByEmail(email)
+	if err != nil {
+		inf.Err404NF(ctx)
+		return
+	}
+
+	err = userService.DeleteUser(email)
+	if err != nil {
+		inf.Err404NF(ctx)
+		return
+	}
+
+	inf.Ok(
+		ctx,
+		nil,
+		&impartial.SuccessImpartial{
+			Code:    http.StatusOK,
+			Message: "delete user successfully",
+		},
+		&response.UserResponse{
+			formatter.EncryptMd5(string(user.Id)),
+			user.Name,
+			user.Email,
+			user.CreatedAt,
+		},
+	)
+}

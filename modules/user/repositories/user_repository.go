@@ -10,6 +10,7 @@ type UserRepository interface {
 	GetAllUser() (*[]map[string]interface{}, error)
 	GetUserByEmail(email string) (*model.UserModel, error)
 	UpdateUser(*model.UserModel) error
+	DeleteUser(email string) error
 }
 
 type UserRepositoryImpl struct {
@@ -55,5 +56,15 @@ func (r UserRepositoryImpl) UpdateUser(data *model.UserModel) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// Delete user by email
+func (r UserRepositoryImpl) DeleteUser(email string) error {
+	_, err := r.db.Table(model.USER_TABLE_NAME).Delete(email)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
