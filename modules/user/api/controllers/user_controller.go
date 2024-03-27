@@ -2,7 +2,9 @@ package controllers
 
 import (
 	inf "dys-go-starter-project/infrastructures"
+	"dys-go-starter-project/modules/user/api/dtos/impartial"
 	"dys-go-starter-project/modules/user/services"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,5 +30,30 @@ func (c *UserController) GetAllUser(ctx *gin.Context) {
 		nil,
 		nil,
 		gin.H{"users": users},
+	)
+}
+
+func (c *UserController) GetUserByEmail(ctx *gin.Context) {
+	email := ctx.Query("email")
+	userService, err := inf.Get[*services.UserService](ctx)
+	if err != nil {
+		inf.Err500ISE(ctx, err.Error())
+		return
+	}
+
+	user, err := userService.GetUserByEmail(email)
+	if err != nil {
+		inf.Err404NF(ctx)
+		return
+	}
+
+	inf.Ok(
+		ctx,
+		nil,
+		&impartial.SuccessImpartial{
+			Code:    http.StatusOK,
+			Message: "get user successfully",
+		},
+		user,
 	)
 }

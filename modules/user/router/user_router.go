@@ -10,5 +10,6 @@ func RegisterUser(r *gin.RouterGroup) {
 	api := r.Group("/user")
 	{
 		api.GET("", new(v1.UserController).GetAllUser)
+		api.GET("/byemail", new(v1.UserController).GetUserByEmail)
 	}
 }
