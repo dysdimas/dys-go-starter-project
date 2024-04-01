@@ -8,11 +8,6 @@ import (
 	"xorm.io/xorm"
 )
 
-type AuthUserRepository interface {
-	FindByEmail(email string) (*model.AuthUserModel, error)
-	SaveUser(data *model.AuthUserModel) (*model.AuthUserModel, error)
-}
-
 type AuthUserRepositoryImpl struct {
 	db *xorm.Engine
 }

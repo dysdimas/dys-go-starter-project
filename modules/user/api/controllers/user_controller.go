@@ -59,10 +59,10 @@ func (c *UserController) GetUserByEmail(ctx *gin.Context) {
 			Message: "get user successfully",
 		},
 		&response.UserResponse{
-			formatter.EncryptMd5(string(user.Id)),
-			user.Name,
-			user.Email,
-			user.CreatedAt,
+			Id:        formatter.EncryptMd5(string(rune(user.Id))),
+			Name:      user.Name,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt,
 		},
 	)
 }
@@ -131,10 +131,10 @@ func (c *UserController) DeleteUser(ctx *gin.Context) {
 			Message: "delete user successfully",
 		},
 		&response.UserResponse{
-			formatter.EncryptMd5(string(user.Id)),
-			user.Name,
-			user.Email,
-			user.CreatedAt,
+			Id:        formatter.EncryptMd5(string(rune(user.Id))),
+			Name:      user.Name,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt,
 		},
 	)
 }
