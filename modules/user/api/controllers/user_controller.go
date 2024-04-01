@@ -59,10 +59,10 @@ func (c *UserController) GetUserByEmail(ctx *gin.Context) {
 			Message: "get user successfully",
 		},
 		&response.UserResponse{
-			formatter.EncryptMd5(string(user.Id)),
-			user.Name,
-			user.Email,
-			user.CreatedAt,
+			Id:        formatter.EncryptMd5(string(rune(user.Id))),
+			Name:      user.Name,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt,
 		},
 	)
 }
@@ -101,4 +101,40 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 		nil,
 	)
 
+}
+
+func (c *UserController) DeleteUser(ctx *gin.Context) {
+	email := ctx.Query("email")
+	userService, err := inf.Get[*services.UserService](ctx)
+	if err != nil {
+		inf.Err500ISE(ctx, err.Error())
+		return
+	}
+
+	user, err := userService.GetUserByEmail(email)
+	if err != nil {
+		inf.Err404NF(ctx)
+		return
+	}
+
+	err = userService.DeleteUser(email)
+	if err != nil {
+		inf.Err404NF(ctx)
+		return
+	}
+
+	inf.Ok(
+		ctx,
+		nil,
+		&impartial.SuccessImpartial{
+			Code:    http.StatusOK,
+			Message: "delete user successfully",
+		},
+		&response.UserResponse{
+			Id:        formatter.EncryptMd5(string(rune(user.Id))),
+			Name:      user.Name,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt,
+		},
+	)
 }

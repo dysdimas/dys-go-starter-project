@@ -78,9 +78,9 @@ func (c *AuthUserController) Login(ctx *gin.Context) {
 			Message: "generate token successfully",
 		},
 		&response.AuthResponse{
-			signedToken,
-			createdAt.Unix(),
-			expiredAt.Unix(),
+			Token:     signedToken,
+			CreatedAt: createdAt.Unix(),
+			ExpiredAt: expiredAt.Unix(),
 		},
 	)
 }

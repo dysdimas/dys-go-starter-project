@@ -6,12 +6,6 @@ import (
 	"xorm.io/xorm"
 )
 
-type UserRepository interface {
-	GetAllUser() (*[]map[string]interface{}, error)
-	GetUserByEmail(email string) (*model.UserModel, error)
-	UpdateUser(*model.UserModel) error
-}
-
 type UserRepositoryImpl struct {
 	db *xorm.Engine
 }
@@ -55,5 +49,15 @@ func (r UserRepositoryImpl) UpdateUser(data *model.UserModel) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// Delete user by email
+func (r UserRepositoryImpl) DeleteUser(email string) error {
+	_, err := r.db.Table(model.USER_TABLE_NAME).Where("email = ?", email).Delete()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
