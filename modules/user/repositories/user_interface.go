@@ -7,4 +7,5 @@ type UserRepository interface {
 	GetUserByEmail(email string) (*model.UserModel, error)
 	UpdateUser(*model.UserModel) error
 	DeleteUser(email string) error
+	UpdateRole(data *model.UserModel) error
 }

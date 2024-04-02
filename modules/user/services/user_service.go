@@ -95,3 +95,27 @@ func (s *UserService) DeleteUser(email string) error {
 	return nil
 
 }
+
+// Update role user by email
+func (s *UserService) UpdateRole(data *model.UserModel) error {
+	userRepository, err := inf.Get[repositories.UserRepository](s.db)
+	if err != nil {
+		return err
+	}
+
+	result, err := userRepository.GetUserByEmail(data.Email)
+	if err != nil {
+		return err
+	}
+
+	if result == nil {
+		return errors.New("user not found")
+	}
+
+	err = userRepository.UpdateRole(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

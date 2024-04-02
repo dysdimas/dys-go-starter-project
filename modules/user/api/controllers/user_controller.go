@@ -138,3 +138,37 @@ func (c *UserController) DeleteUser(ctx *gin.Context) {
 		},
 	)
 }
+
+func (c *UserController) UpdateRole(ctx *gin.Context) {
+	requestBody := &request.UserUpdateRequest{}
+	err := ctx.ShouldBindJSON(requestBody)
+	if err != nil {
+		inf.Err400BR(ctx, err.Error())
+		return
+	}
+	userService, err := inf.Get[*services.UserService](ctx)
+	if err != nil {
+		inf.Err500ISE(ctx, err.Error())
+		return
+	}
+
+	cnvUserModel := &model.UserModel{
+		Role:  requestBody.Role,
+		Email: requestBody.Email,
+	}
+	err = userService.UpdateRole(cnvUserModel)
+	if err != nil {
+		inf.Err400BR(ctx, err.Error())
+		return
+	}
+
+	inf.Ok(
+		ctx,
+		nil,
+		&impartial.SuccessImpartial{
+			Code:    http.StatusOK,
+			Message: "update user role successfully",
+		},
+		nil,
+	)
+}
