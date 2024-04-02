@@ -61,3 +61,15 @@ func (r UserRepositoryImpl) DeleteUser(email string) error {
 
 	return nil
 }
+
+// Update role user by email
+func (r UserRepositoryImpl) UpdateRole(data *model.UserModel) error {
+	_, err := r.db.Table(model.USER_TABLE_NAME).Update(&model.UserModel{
+		Role: data.Role,
+	}, &model.UserModel{Email: data.Email})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
